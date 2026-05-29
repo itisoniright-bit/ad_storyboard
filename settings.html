@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>스토리보드 설정</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #0064FF; --blue-light: #e8f0ff;
+      --gray-100: #f5f6f7; --gray-200: #e9eaeb;
+      --gray-400: #9da4ae; --gray-700: #374151; --gray-900: #111827;
+      --font: 'Noto Sans KR', -apple-system, sans-serif;
+    }
+    body { font-family: var(--font); background: var(--gray-100); color: var(--gray-900); min-height: 100vh; padding: 40px 20px; }
+
+    .container { max-width: 680px; margin: 0 auto; }
+
+    .header { margin-bottom: 28px; }
+    .header h1 { font-size: 22px; font-weight: 700; }
+    .header p { font-size: 14px; color: var(--gray-400); margin-top: 4px; }
+
+    .card { background: white; border-radius: 12px; border: 1px solid var(--gray-200); padding: 28px; margin-bottom: 16px; }
+    .card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-400); margin-bottom: 18px; }
+
+    .field { margin-bottom: 18px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { display: block; font-size: 13px; font-weight: 700; color: var(--gray-700); margin-bottom: 6px; }
+    .field .desc { font-size: 11px; color: var(--gray-400); margin-bottom: 6px; line-height: 1.5; }
+
+    /* 라디오 버튼 그룹 */
+    .radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .radio-group input[type="radio"] { display: none; }
+    .radio-group label {
+      padding: 8px 14px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+      font-size: 13px; cursor: pointer; color: var(--gray-700); background: white;
+      transition: all 0.15s; font-family: var(--font); font-weight: 600;
+    }
+    .radio-group input[type="radio"]:checked + label {
+      background: var(--blue-light); border-color: var(--blue); color: var(--blue);
+    }
+    .radio-group label:hover { border-color: var(--blue); }
+
+    /* 텍스트 입력 */
+    .field input[type="text"], .field textarea {
+      width: 100%; padding: 9px 12px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+      font-size: 13px; font-family: var(--font); color: var(--gray-900); outline: none;
+      transition: border-color 0.15s;
+    }
+    .field input[type="text"]:focus, .field textarea:focus { border-color: var(--blue); }
+    .field textarea { resize: vertical; min-height: 60px; }
+    .field .placeholder-hint { font-size: 11px; color: var(--gray-400); margin-top: 4px; }
+
+    /* datalist 입력 */
+    .field input[list] {
+      width: 100%; padding: 9px 12px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+      font-size: 13px; font-family: var(--font); color: var(--gray-900); outline: none;
+    }
+    .field input[list]:focus { border-color: var(--blue); }
+
+    /* 생성 버튼 */
+    .btn-wrap { margin-top: 24px; display: flex; gap: 10px; }
+    .btn-save {
+      flex: 1; padding: 14px; background: var(--blue); color: white; border: none;
+      border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer;
+      font-family: var(--font); transition: background 0.15s;
+    }
+    .btn-save:hover { background: #0050cc; }
+    .btn-preview {
+      padding: 14px 20px; background: var(--gray-100); color: var(--gray-700);
+      border: 1.5px solid var(--gray-200); border-radius: 10px; font-size: 14px;
+      font-weight: 700; cursor: pointer; font-family: var(--font); white-space: nowrap;
+    }
+    .btn-preview:hover { background: var(--gray-200); }
+
+    /* 상태 메시지 */
+    .status { margin-top: 14px; padding: 12px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; display: none; }
+    .status.success { background: #dcfce7; color: #166534; display: block; }
+    .status.error   { background: #fef2f2; color: #991b1b; display: block; }
+
+    /* 현재 설정 표시 */
+    .current-badge {
+      display: inline-block; font-size: 11px; background: #fffbeb; color: #92400e;
+      border: 1px solid #fde68a; border-radius: 4px; padding: 2px 7px;
+      margin-left: 8px; font-weight: 600; vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>스토리보드 설정</h1>
+    <p>설정을 변경하고 저장하면 생성요청.md가 자동으로 업데이트돼요.</p>
+  </div>
+
+  <!-- 캠페인 -->
+  <div class="card">
+    <div class="card-title">캠페인</div>
+
+    <div class="field">
+      <label>캠페인 목적</label>
+      <div class="radio-group">
+        <input type="radio" name="campaign" id="c1" value="어시스턴트 첫 사용 유도">
+        <label for="c1">어시스턴트 첫 사용 유도</label>
+        <input type="radio" name="campaign" id="c2" value="회원가입 유도">
+        <label for="c2">회원가입 유도</label>
+        <input type="radio" name="campaign" id="c3" value="브랜드 인지도">
+        <label for="c3">브랜드 인지도</label>
+        <input type="radio" name="campaign" id="c4" value="재방문 유도">
+        <label for="c4">재방문 유도</label>
+      </div>
+      <input type="text" id="campaign-custom" placeholder="직접 입력 (선택 시 위 라디오 무시)" style="margin-top:8px">
+    </div>
+
+    <div class="field">
+      <label>강조점 <span style="font-weight:400;color:var(--gray-400);font-size:12px">(선택)</span></label>
+      <div class="desc">수치, 슬로건 등 이 광고에서 특히 강조하고 싶은 포인트</div>
+      <input type="text" id="emphasis" placeholder="예: 컬처핏 매칭률 94%, 이번엔 다르게">
+    </div>
+  </div>
+
+  <!-- 타겟 -->
+  <div class="card">
+    <div class="card-title">타겟 페르소나</div>
+    <div class="field">
+      <div class="radio-group" style="flex-direction:column; gap:10px">
+        <span>
+          <input type="radio" name="persona" id="p1" value="1">
+          <label for="p1" style="display:inline-block">① 재이직 두려움</label>
+          <span style="font-size:12px;color:var(--gray-400);margin-left:8px">32세 마케터 — 이직 실패 경험, 또 실패할까봐 두려워서 탐색 못함</span>
+        </span>
+        <span>
+          <input type="radio" name="persona" id="p2" value="2">
+          <label for="p2" style="display:inline-block">② 방향 없는 주니어</label>
+          <span style="font-size:12px;color:var(--gray-400);margin-left:8px">27세 기획 2년차 — 이 직무가 맞는지 모르겠고 방향 자체가 없음</span>
+        </span>
+        <span>
+          <input type="radio" name="persona" id="p3" value="3">
+          <label for="p3" style="display:inline-block">③ 조용한 퇴사자</label>
+          <span style="font-size:12px;color:var(--gray-400);margin-left:8px">35세 영업 7년차 — 번아웃, 이직 의지 있으나 에너지 없어 탐색 미룸</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 광고 설정 -->
+  <div class="card">
+    <div class="card-title">광고 설정</div>
+
+    <div class="field">
+      <label>광고 개념</label>
+      <div class="radio-group">
+        <input type="radio" name="concept" id="co1" value="팩트자극"><label for="co1">팩트자극</label>
+        <input type="radio" name="concept" id="co2" value="공감"><label for="co2">공감</label>
+        <input type="radio" name="concept" id="co3" value="해결사"><label for="co3">해결사</label>
+        <input type="radio" name="concept" id="co4" value="호기심"><label for="co4">호기심</label>
+        <input type="radio" name="concept" id="co5" value="데이터"><label for="co5">데이터</label>
+      </div>
+      <div class="desc" style="margin-top:6px">
+        팩트자극=수치로 신뢰 &nbsp;|&nbsp; 공감=감정 공감 &nbsp;|&nbsp; 해결사=문제 해결 제시 &nbsp;|&nbsp; 호기심=궁금증 유발 &nbsp;|&nbsp; 데이터=통계 중심
+      </div>
+    </div>
+
+    <div class="field">
+      <label>이미지 구성</label>
+      <div class="radio-group">
+        <input type="radio" name="layout" id="l1" value="텍스트70+이미지30"><label for="l1">텍스트70+이미지30</label>
+        <input type="radio" name="layout" id="l2" value="텍스트100"><label for="l2">텍스트100</label>
+        <input type="radio" name="layout" id="l3" value="이미지100"><label for="l3">이미지100</label>
+      </div>
+      <div class="desc" style="margin-top:6px">
+        텍스트70+이미지30=카피가 주인공, 숫자/아이콘 보조 &nbsp;|&nbsp; 텍스트100=문장만으로 승부 &nbsp;|&nbsp; 이미지100=숫자/비주얼만으로 전달
+      </div>
+    </div>
+
+    <div class="field">
+      <label>비주얼 키</label>
+      <div class="radio-group">
+        <input type="radio" name="visual" id="v1" value="미니멀 클린"><label for="v1">미니멀 클린</label>
+        <input type="radio" name="visual" id="v2" value="따뜻한 일상"><label for="v2">따뜻한 일상</label>
+        <input type="radio" name="visual" id="v3" value="대비 강조"><label for="v3">대비 강조</label>
+        <input type="radio" name="visual" id="v4" value="패스트 부드럼"><label for="v4">패스트 부드럼</label>
+        <input type="radio" name="visual" id="v5" value="에너지 힙"><label for="v5">에너지 힙</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>메인 컬러 <span style="font-weight:400;color:var(--gray-400);font-size:12px">(선택)</span></label>
+      <input type="text" id="color" placeholder='예: "#0064FF" 또는 "딥 그린" — 비워두면 비주얼 키 기본값 사용'>
+    </div>
+
+    <div class="field">
+      <label>사이즈</label>
+      <div class="radio-group">
+        <input type="radio" name="size" id="s1" value="둘 다"><label for="s1">둘 다 (피드+스토리)</label>
+        <input type="radio" name="size" id="s2" value="피드"><label for="s2">피드만 (1080×1080)</label>
+        <input type="radio" name="size" id="s3" value="스토리"><label for="s3">스토리만 (1080×1920)</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>강조 메모 <span style="font-weight:400;color:var(--gray-400);font-size:12px">(선택)</span></label>
+      <textarea id="memo" placeholder="추가 요청사항을 자유롭게 입력하세요&#10;예: 번아웃 직장인의 지친 느낌을 이미지에 담아줘"></textarea>
+    </div>
+  </div>
+
+  <div class="btn-wrap">
+    <button class="btn-save" onclick="saveSettings()">설정 저장하기</button>
+    <button class="btn-preview" onclick="location.href='/ad_preview.html'">광고 소재 편집기 →</button>
+    <button class="btn-preview" onclick="window.open('https://www.notion.so/5977952b7aeb4ddf800af0f1f15a6798','_blank')">Notion 아카이브 →</button>
+  </div>
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+  // 현재 설정 불러오기
+  async function loadSettings() {
+    try {
+      const res = await fetch('/api/request-settings');
+      if (!res.ok) return;
+      const s = await res.json();
+
+      // 캠페인 목적
+      const campaigns = ['어시스턴트 첫 사용 유도','회원가입 유도','브랜드 인지도','재방문 유도'];
+      if (campaigns.includes(s.campaign)) {
+        document.querySelector(`input[name="campaign"][value="${s.campaign}"]`).checked = true;
+      } else if (s.campaign) {
+        document.getElementById('campaign-custom').value = s.campaign;
+      }
+
+      if (s.emphasis) document.getElementById('emphasis').value = s.emphasis;
+
+      // 페르소나
+      const pBtn = document.querySelector(`input[name="persona"][value="${s.persona}"]`);
+      if (pBtn) pBtn.checked = true;
+
+      // 광고 개념
+      const cBtn = document.querySelector(`input[name="concept"][value="${s.concept}"]`);
+      if (cBtn) cBtn.checked = true;
+
+      // 이미지 구성
+      const lBtn = document.querySelector(`input[name="layout"][value="${s.layout}"]`);
+      if (lBtn) lBtn.checked = true;
+
+      // 비주얼 키
+      const vBtn = document.querySelector(`input[name="visual"][value="${s.visual}"]`);
+      if (vBtn) vBtn.checked = true;
+
+      if (s.color) document.getElementById('color').value = s.color;
+
+      // 사이즈
+      const sBtn = document.querySelector(`input[name="size"][value="${s.size}"]`);
+      if (sBtn) sBtn.checked = true;
+
+      if (s.memo) document.getElementById('memo').value = s.memo;
+    } catch(e) {}
+  }
+
+  async function saveSettings() {
+    const customCampaign = document.getElementById('campaign-custom').value.trim();
+    const checkedCampaign = document.querySelector('input[name="campaign"]:checked');
+
+    const data = {
+      campaign: customCampaign || (checkedCampaign ? checkedCampaign.value : '어시스턴트 첫 사용 유도'),
+      emphasis: document.getElementById('emphasis').value.trim(),
+      persona:  document.querySelector('input[name="persona"]:checked')?.value || '1',
+      concept:  document.querySelector('input[name="concept"]:checked')?.value || '팩트자극',
+      layout:   document.querySelector('input[name="layout"]:checked')?.value || '텍스트70+이미지30',
+      visual:   document.querySelector('input[name="visual"]:checked')?.value || '미니멀 클린',
+      color:    document.getElementById('color').value.trim(),
+      size:     document.querySelector('input[name="size"]:checked')?.value || '둘 다',
+      memo:     document.getElementById('memo').value.trim(),
+    };
+
+    try {
+      const res = await fetch('/api/request-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      const el = document.getElementById('status');
+      if (result.success) {
+        el.className = 'status success';
+        el.textContent = '✅ 저장 완료! Claude Code에 "생성요청.md 보고 스토리보드 만들어줘" 라고 입력하세요.';
+      } else {
+        el.className = 'status error';
+        el.textContent = '❌ 저장 실패: ' + result.error;
+      }
+    } catch(e) {
+      const el = document.getElementById('status');
+      el.className = 'status error';
+      el.textContent = '❌ 서버에 연결할 수 없어요. npm start를 실행해주세요.';
+    }
+  }
+
+  loadSettings();
+</script>
+</body>
+</html>

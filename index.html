@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>광고 스토리보드 생성기</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #0064FF;
+      --blue-light: #e8f0ff;
+      --gray-100: #f5f6f7;
+      --gray-200: #e9eaeb;
+      --gray-400: #9da4ae;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --red: #ef4444;
+      --green: #22c55e;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+      --mono: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: var(--font);
+      background: var(--gray-100);
+      color: var(--gray-900);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── 헤더 ── */
+    .header {
+      background: white;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .header h1 { font-size: 15px; font-weight: 700; }
+    .header .brand { font-size: 12px; color: var(--gray-400); }
+
+    /* ── 메인 레이아웃 ── */
+    .main {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── 폼 패널 ── */
+    .form-panel {
+      width: 320px;
+      flex-shrink: 0;
+      background: white;
+      border-right: 1px solid var(--gray-200);
+      display: flex;
+      flex-direction: column;
+    }
+    .form-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+    .form-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--gray-200);
+    }
+
+    /* ── 폼 필드 ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--gray-400);
+      margin: 16px 0 10px;
+    }
+    .section-label:first-child { margin-top: 0; }
+
+    .field { margin-bottom: 12px; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 4px;
+    }
+    .field label .opt {
+      font-weight: 400;
+      color: var(--gray-400);
+      font-size: 11px;
+    }
+    .field input, .field textarea, .field select {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: var(--font);
+      color: var(--gray-900);
+      background: white;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: var(--blue);
+    }
+    .field textarea { resize: vertical; min-height: 56px; }
+    .field-hint { font-size: 11px; color: var(--gray-400); margin-top: 3px; line-height: 1.4; }
+
+    /* ── 페르소나 버튼 ── */
+    .persona-row {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+    .persona-btn {
+      flex: 1;
+      padding: 6px 4px;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      font-size: 11px;
+      text-align: center;
+      cursor: pointer;
+      background: white;
+      color: var(--gray-700);
+      font-family: var(--font);
+      transition: all 0.15s;
+      line-height: 1.3;
+    }
+    .persona-btn.active {
+      background: var(--blue-light);
+      border-color: var(--blue);
+      color: var(--blue);
+      font-weight: 600;
+    }
+
+    /* ── 버튼 ── */
+    .btn {
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font);
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--blue); color: white; width: 100%; }
+    .btn-primary:hover { background: #0050cc; }
+    .btn-primary:disabled { background: var(--gray-200); color: var(--gray-400); cursor: not-allowed; }
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-700);
+      border: 1px solid var(--gray-200);
+    }
+    .btn-secondary:hover { background: var(--gray-200); }
+    .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-danger { background: white; color: var(--red); border: 1px solid var(--gray-200); }
+    .btn-danger:hover { background: #fef2f2; border-color: var(--red); }
+
+    /* ── 출력 패널 ── */
+    .output-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: white;
+    }
+    .output-toolbar {
+      padding: 9px 16px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .output-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--gray-200); flex-shrink: 0;
+    }
+    .status-dot.generating { background: var(--blue); animation: blink 1s ease-in-out infinite; }
+    .status-dot.done { background: var(--green); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .board-id-badge {
+      font-size: 11px;
+      font-family: var(--mono);
+      background: var(--gray-100);
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: var(--gray-700);
+    }
+    .saved-badge {
+      font-size: 11px; font-weight: 600;
+      background: #dcfce7; color: #166534;
+      padding: 2px 8px; border-radius: 4px;
+    }
+    .notion-link {
+      font-size: 11px; font-weight: 600;
+      background: #f3f0ff; color: #5b21b6;
+      padding: 2px 8px; border-radius: 4px;
+      text-decoration: none;
+    }
+    .notion-link:hover { background: #ede9fe; }
+
+    .toolbar-right { display: flex; align-items: center; gap: 6px; }
+
+    .view-toggle {
+      display: flex;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .view-btn {
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      background: white;
+      border: none;
+      color: var(--gray-700);
+      font-family: var(--font);
+    }
+    .view-btn.active { background: var(--blue); color: white; }
+
+    .action-group { display: flex; gap: 6px; }
+
+    .output-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+    }
+
+    /* ── 빈 상태 ── */
+    .empty-state {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--gray-400);
+    }
+    .empty-icon { font-size: 36px; }
+    .empty-state p { font-size: 14px; }
+
+    /* ── raw 출력 ── */
+    #output-raw {
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* ── 렌더링 출력 ── */
+    #output-rendered {
+      max-width: 780px;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+    #output-rendered h1 { font-size: 20px; margin: 28px 0 12px; }
+    #output-rendered h2 { font-size: 16px; margin: 22px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--gray-200); }
+    #output-rendered h3 { font-size: 14px; margin: 16px 0 8px; }
+    #output-rendered p { margin-bottom: 10px; }
+    #output-rendered ul, #output-rendered ol { padding-left: 20px; margin-bottom: 10px; }
+    #output-rendered li { margin-bottom: 4px; }
+    #output-rendered table { border-collapse: collapse; width: 100%; margin-bottom: 16px; font-size: 13px; }
+    #output-rendered th, #output-rendered td { border: 1px solid var(--gray-200); padding: 8px 12px; }
+    #output-rendered th { background: var(--gray-100); font-weight: 600; }
+    #output-rendered code { background: var(--gray-100); padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: var(--mono); }
+    #output-rendered pre { background: var(--gray-100); padding: 12px 16px; border-radius: 6px; overflow-x: auto; margin-bottom: 12px; }
+    #output-rendered pre code { background: none; padding: 0; }
+    #output-rendered blockquote { border-left: 3px solid var(--blue); padding-left: 14px; color: var(--gray-700); margin-bottom: 10px; }
+    #output-rendered strong { font-weight: 700; }
+
+    /* ── 목록 패널 ── */
+    .list-panel {
+      border-top: 1px solid var(--gray-200);
+      background: white;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      max-height: 130px;
+    }
+    .list-header {
+      padding: 7px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gray-700);
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .list-scroll {
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px;
+      overflow-x: auto;
+      flex: 1;
+      align-items: flex-start;
+    }
+    .list-empty {
+      font-size: 12px;
+      color: var(--gray-400);
+      align-self: center;
+    }
+    .board-card {
+      flex-shrink: 0;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      padding: 7px 10px;
+      cursor: default;
+      font-size: 11px;
+      min-width: 155px;
+      background: white;
+    }
+    .board-card-id {
+      font-family: var(--mono);
+      color: var(--gray-700);
+      margin-bottom: 5px;
+      line-height: 1.3;
+    }
+    .board-card-actions { display: flex; gap: 4px; }
+    .card-btn {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid var(--gray-200);
+      background: white;
+      cursor: pointer;
+      color: var(--gray-700);
+      font-family: var(--font);
+    }
+    .card-btn:hover { background: var(--gray-100); }
+
+    /* ── 토스트 ── */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--gray-900);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 9999;
+      animation: slideUp 0.2s ease;
+      pointer-events: none;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(12px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    /* ── 스크롤바 ── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
+  </style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<header class="header">
+  <h1>광고 스토리보드 생성기</h1>
+  <span class="brand">커리어벗 · Meta 광고</span>
+</header>
+
+<!-- 메인 -->
+<div class="main">
+
+  <!-- 폼 패널 -->
+  <div class="form-panel">
+    <div class="form-scroll">
+
+      <div class="section-label">캠페인</div>
+
+      <div class="field">
+        <label>캠페인 목적</label>
+        <input type="text" id="캠페인_목적" value="어시스턴트 첫 사용 유도">
+      </div>
+
+      <div class="field">
+        <label>강조점 <span class="opt">(선택)</span></label>
+        <input type="text" id="강조점" placeholder="예: 94% 컬처핏 매칭률">
+      </div>
+
+      <div class="section-label">페르소나</div>
+
+      <div class="field">
+        <label>페르소나 선택</label>
+        <div class="persona-row">
+          <button class="persona-btn active" data-val="1" onclick="setPersona(this)">① 재이직<br>두려움</button>
+          <button class="persona-btn" data-val="2" onclick="setPersona(this)">② 방향<br>없음</button>
+          <button class="persona-btn" data-val="3" onclick="setPersona(this)">③ 조용한<br>퇴사</button>
+        </div>
+        <input type="text" id="페르소나_custom" placeholder="직접 입력 (입력 시 위 선택 무시)">
+        <div class="field-hint">① 32세 마케터, 재이직 실패 두려움 &nbsp;② 27세 기획, 방향 미정 &nbsp;③ 35세 영업, 번아웃</div>
+      </div>
+
+      <div class="section-label">광고 설정</div>
+
+      <div class="field">
+        <label>광고 개념</label>
+        <input list="개념-list" id="광고_개념" value="팩트자극">
+        <datalist id="개념-list">
+          <option value="팩트자극">
+          <option value="해결사">
+          <option value="공감">
+          <option value="호기심">
+          <option value="데이터">
+        </datalist>
+      </div>
+
+      <div class="field">
+        <label>이미지 구성</label>
+        <input list="이미지구성-list" id="이미지_구성" value="텍스트70+이미지30">
+        <datalist id="이미지구성-list">
+          <option value="텍스트70+이미지30">
+          <option value="텍스트100">
+          <option value="이미지100">
+        </datalist>
+      </div>
+
+      <div class="field">
+        <label>비주얼 키</label>
+        <input list="비주얼-list" id="비주얼_키" value="미니멀 클린">
+        <datalist id="비주얼-list">
+          <option value="미니멀 클린">
+          <option value="따뜻한 일상">
+          <option value="대비 강조">
+          <option value="패스트 부드럼">
+          <option value="에너지 힙">
+        </datalist>
+      </div>
+
+      <div class="field">
+        <label>메인 컬러 <span class="opt">(선택)</span></label>
+        <input type="text" id="메인_컬러" placeholder='예: "#0064FF" 또는 "딥 그린"'>
+      </div>
+
+      <div class="field">
+        <label>사이즈</label>
+        <select id="사이즈">
+          <option value="둘 다">둘 다 — 피드(1080×1080) + 스토리(1080×1920)</option>
+          <option value="피드">피드만 — 1080×1080</option>
+          <option value="스토리">스토리만 — 1080×1920</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>강조 메모 <span class="opt">(선택)</span></label>
+        <textarea id="강조_메모" placeholder="추가 요청사항을 자유롭게 입력하세요"></textarea>
+      </div>
+
+    </div>
+    <div class="form-footer">
+      <button class="btn btn-primary" id="btn-generate" onclick="handleGenerate()">생성하기</button>
+    </div>
+  </div>
+
+  <!-- 출력 패널 -->
+  <div class="output-panel">
+    <div class="output-toolbar">
+      <div class="output-meta">
+        <div class="status-dot" id="status-dot"></div>
+        <span class="board-id-badge" id="board-id-badge">–</span>
+        <span class="saved-badge" id="saved-badge" style="display:none">저장됨</span>
+        <a class="notion-link" id="notion-link" href="#" target="_blank" style="display:none">Notion ↗</a>
+      </div>
+      <div class="toolbar-right">
+        <div class="view-toggle" id="view-toggle" style="display:none">
+          <button class="view-btn active" id="view-btn-raw" onclick="setView('raw')">원문</button>
+          <button class="view-btn" id="view-btn-rendered" onclick="setView('rendered')">렌더링</button>
+        </div>
+        <div class="action-group" id="action-group" style="display:none">
+          <button class="btn btn-secondary" id="btn-regen" onclick="handleRegenerate()">재생성</button>
+          <button class="btn btn-secondary" id="btn-save" onclick="handleSave()">저장</button>
+          <button class="btn btn-danger" id="btn-cancel" onclick="handleCancel()">취소</button>
+        </div>
+      </div>
+    </div>
+    <div class="output-body" id="output-body">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">📋</div>
+        <p>설정을 입력하고 생성하기를 누르세요</p>
+      </div>
+      <div id="output-raw" style="display:none"></div>
+      <div id="output-rendered" style="display:none"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 목록 패널 -->
+<div class="list-panel">
+  <div class="list-header">
+    저장된 스토리보드
+    <button class="btn btn-secondary" style="padding:3px 8px;font-size:11px;font-weight:500" onclick="loadList()">새로고침</button>
+  </div>
+  <div class="list-scroll" id="list-scroll">
+    <span class="list-empty">아직 저장된 스토리보드가 없습니다</span>
+  </div>
+</div>
+
+<script>
+// ─── 상태 ─────────────────────────────────────────────────────────────────
+let state = {
+  boardId: null,
+  markdown: '',
+  inputs: {},
+  generating: false,
+  saved: false,
+  view: 'raw',
+  persona: '1',
+  abortCtrl: null,
+};
+
+// ─── 페르소나 ──────────────────────────────────────────────────────────────
+function setPersona(btn) {
+  document.querySelectorAll('.persona-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.persona = btn.dataset.val;
+  document.getElementById('페르소나_custom').value = '';
+}
+
+// ─── 폼 ────────────────────────────────────────────────────────────────────
+function readForm() {
+  const custom = document.getElementById('페르소나_custom').value.trim();
+  return {
+    캠페인_목적: document.getElementById('캠페인_목적').value.trim() || '어시스턴트 첫 사용 유도',
+    강조점:      document.getElementById('강조점').value.trim(),
+    페르소나:    custom || state.persona,
+    광고_개념:   document.getElementById('광고_개념').value.trim() || '팩트자극',
+    이미지_구성: document.getElementById('이미지_구성').value.trim() || '텍스트70+이미지30',
+    비주얼_키:   document.getElementById('비주얼_키').value.trim() || '미니멀 클린',
+    메인_컬러:   document.getElementById('메인_컬러').value.trim(),
+    사이즈:      document.getElementById('사이즈').value,
+    강조_메모:   document.getElementById('강조_메모').value.trim(),
+  };
+}
+
+function fillForm(s) {
+  if (s.캠페인_목적) document.getElementById('캠페인_목적').value = s.캠페인_목적;
+  if (s.강조점 !== undefined) document.getElementById('강조점').value = s.강조점;
+  if (s.페르소나) {
+    const btn = document.querySelector(`.persona-btn[data-val="${s.페르소나}"]`);
+    if (btn) setPersona(btn);
+    else document.getElementById('페르소나_custom').value = s.페르소나;
+  }
+  if (s.광고_개념) document.getElementById('광고_개념').value = s.광고_개념;
+  if (s.이미지_구성) document.getElementById('이미지_구성').value = s.이미지_구성;
+  if (s.비주얼_키) document.getElementById('비주얼_키').value = s.비주얼_키;
+  if (s.메인_컬러 !== undefined) document.getElementById('메인_컬러').value = s.메인_컬러;
+  if (s.사이즈) document.getElementById('사이즈').value = s.사이즈;
+  if (s.강조_메모 !== undefined) document.getElementById('강조_메모').value = s.강조_메모;
+}
+
+// ─── 뷰 토글 ───────────────────────────────────────────────────────────────
+function setView(mode) {
+  state.view = mode;
+  const raw      = document.getElementById('output-raw');
+  const rendered = document.getElementById('output-rendered');
+  const btnRaw   = document.getElementById('view-btn-raw');
+  const btnRend  = document.getElementById('view-btn-rendered');
+  if (mode === 'raw') {
+    raw.style.display = '';
+    rendered.style.display = 'none';
+    btnRaw.classList.add('active');
+    btnRend.classList.remove('active');
+  } else {
+    raw.style.display = 'none';
+    rendered.innerHTML = marked.parse(state.markdown);
+    rendered.style.display = '';
+    btnRaw.classList.remove('active');
+    btnRend.classList.add('active');
+  }
+}
+
+// ─── UI 상태 관리 ─────────────────────────────────────────────────────────
+function setUI(phase) {
+  const btnGen    = document.getElementById('btn-generate');
+  const dot       = document.getElementById('status-dot');
+  const actions   = document.getElementById('action-group');
+  const btnRegen  = document.getElementById('btn-regen');
+  const btnSave   = document.getElementById('btn-save');
+  const btnCancel = document.getElementById('btn-cancel');
+  const toggle    = document.getElementById('view-toggle');
+
+  if (phase === 'generating') {
+    dot.className = 'status-dot generating';
+    btnGen.disabled = true;
+    btnGen.textContent = '생성 중...';
+    actions.style.display = '';
+    btnRegen.style.display = 'none';
+    btnSave.style.display = 'none';
+    btnCancel.style.display = '';
+    toggle.style.display = 'none';
+  } else if (phase === 'done') {
+    dot.className = 'status-dot done';
+    btnGen.disabled = false;
+    btnGen.textContent = '생성하기';
+    actions.style.display = '';
+    btnRegen.style.display = '';
+    btnSave.style.display = '';
+    btnCancel.style.display = 'none';
+    toggle.style.display = '';
+  } else { // idle
+    dot.className = 'status-dot';
+    btnGen.disabled = false;
+    btnGen.textContent = '생성하기';
+    actions.style.display = 'none';
+    toggle.style.display = 'none';
+  }
+}
+
+function resetOutput() {
+  document.getElementById('empty-state').style.display = 'none';
+  const raw = document.getElementById('output-raw');
+  raw.textContent = '';
+  raw.style.display = '';
+  document.getElementById('output-rendered').style.display = 'none';
+  document.getElementById('saved-badge').style.display = 'none';
+  document.getElementById('notion-link').style.display = 'none';
+  document.getElementById('board-id-badge').textContent = '–';
+  state.view = 'raw';
+}
+
+function appendText(text) {
+  const raw = document.getElementById('output-raw');
+  raw.textContent += text;
+  const body = document.getElementById('output-body');
+  body.scrollTop = body.scrollHeight;
+}
+
+// ─── 생성 ──────────────────────────────────────────────────────────────────
+async function handleGenerate() {
+  if (state.generating) return;
+
+  state.inputs   = readForm();
+  state.markdown = '';
+  state.boardId  = null;
+  state.saved    = false;
+  state.generating = true;
+
+  resetOutput();
+  setUI('generating');
+
+  state.abortCtrl = new AbortController();
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state.inputs),
+      signal: state.abortCtrl.signal,
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || res.statusText);
+    }
+
+    const reader  = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer    = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const data = JSON.parse(line.slice(6));
+          if (data.type === 'id') {
+            state.boardId = data.boardId;
+            document.getElementById('board-id-badge').textContent = data.boardId;
+          } else if (data.type === 'text') {
+            state.markdown += data.text;
+            appendText(data.text);
+          } else if (data.type === 'done') {
+            state.generating = false;
+            setUI('done');
+          } else if (data.type === 'error') {
+            throw new Error(data.message);
+          }
+        } catch (e) {
+          if (e.message && e.message !== 'Unexpected end of JSON input') console.error(e);
+        }
+      }
+    }
+
+  } catch (err) {
+    state.generating = false;
+    if (err.name === 'AbortError') {
+      if (state.markdown.length > 0) setUI('done');
+      else setUI('idle');
+    } else {
+      appendText(`\n\n오류: ${err.message}`);
+      setUI('idle');
+      showToast('생성 실패: ' + err.message);
+    }
+  }
+}
+
+async function handleRegenerate() {
+  state.saved = false;
+  document.getElementById('saved-badge').style.display = 'none';
+  document.getElementById('notion-link').style.display = 'none';
+  await handleGenerate();
+}
+
+function handleCancel() {
+  if (state.abortCtrl) state.abortCtrl.abort();
+}
+
+// ─── 저장 ──────────────────────────────────────────────────────────────────
+async function handleSave() {
+  if (!state.boardId || !state.markdown || state.saved) return;
+
+  const btn = document.getElementById('btn-save');
+  btn.textContent = '저장 중...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        boardId:  state.boardId,
+        markdown: state.markdown,
+        inputs:   state.inputs,
+      }),
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      state.saved = true;
+      document.getElementById('saved-badge').style.display = '';
+      if (result.notionUrl) {
+        const link = document.getElementById('notion-link');
+        link.href = result.notionUrl;
+        link.style.display = '';
+      }
+      showToast('저장 완료!');
+      loadList();
+    } else {
+      showToast('저장 실패');
+    }
+  } catch (err) {
+    showToast('저장 실패: ' + err.message);
+  } finally {
+    btn.textContent = '저장';
+    btn.disabled = false;
+  }
+}
+
+// ─── 목록 ──────────────────────────────────────────────────────────────────
+async function loadList() {
+  try {
+    const res    = await fetch('/api/storyboards');
+    const boards = await res.json();
+    const scroll = document.getElementById('list-scroll');
+
+    if (!boards.length) {
+      scroll.innerHTML = '<span class="list-empty">아직 저장된 스토리보드가 없습니다</span>';
+      return;
+    }
+
+    scroll.innerHTML = boards.map(b => `
+      <div class="board-card">
+        <div class="board-card-id">${b.id}</div>
+        <div class="board-card-actions">
+          <button class="card-btn" onclick="viewBoard('${b.id}')">보기</button>
+          <button class="card-btn" onclick="copySettings('${b.id}')">설정 복사</button>
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    console.error('목록 로드 실패:', err);
+  }
+}
+
+async function viewBoard(id) {
+  try {
+    const res  = await fetch(`/api/storyboard/${id}`);
+    const data = await res.json();
+    state.markdown = data.markdown;
+    state.boardId  = id;
+    state.saved    = true;
+
+    document.getElementById('empty-state').style.display = 'none';
+    const raw = document.getElementById('output-raw');
+    raw.textContent = data.markdown;
+    raw.style.display = '';
+    document.getElementById('output-rendered').style.display = 'none';
+    document.getElementById('board-id-badge').textContent = id;
+    document.getElementById('saved-badge').style.display = '';
+    document.getElementById('notion-link').style.display = 'none';
+
+    state.view = 'raw';
+    setUI('done');
+    document.getElementById('btn-save').style.display = 'none';
+
+    const body = document.getElementById('output-body');
+    body.scrollTop = 0;
+  } catch (err) {
+    showToast('불러오기 실패: ' + err.message);
+  }
+}
+
+async function copySettings(id) {
+  try {
+    const res = await fetch(`/api/settings/${id}`);
+    if (!res.ok) throw new Error('설정 파일 없음');
+    const settings = await res.json();
+    fillForm(settings);
+    showToast('설정을 복사했습니다');
+  } catch (err) {
+    showToast('설정 복사 실패: ' + err.message);
+  }
+}
+
+// ─── 토스트 ────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  document.querySelector('.toast')?.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
+
+// ─── 초기화 ────────────────────────────────────────────────────────────────
+loadList();
+</script>
+</body>
+</html>

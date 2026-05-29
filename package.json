@@ -1,0 +1,14 @@
+{
+  "name": "ad-storyboard",
+  "version": "1.0.0",
+  "description": "광고 스토리보드 생성기 (Node.js + HTML)",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.40.0",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.0"
+  }
+}

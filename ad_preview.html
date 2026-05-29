@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>광고 소재 미리보기</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #0064FF;
+      --dark: #111827;
+      --gray: #6B7280;
+      --light: #F8F9FA;
+      --font: 'Noto Sans KR', -apple-system, sans-serif;
+    }
+
+    body {
+      background: #1a1a2e;
+      font-family: var(--font);
+      color: white;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    /* ── 상단 컨트롤 ── */
+    .page-header {
+      max-width: 1100px;
+      margin: 0 auto 40px;
+    }
+    .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .page-header p { font-size: 14px; color: #9ca3af; }
+
+    .controls {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .control-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #9ca3af;
+      margin-bottom: 5px;
+    }
+
+    .control-group input, .control-group select, .control-group textarea {
+      width: 100%;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 6px;
+      color: white;
+      font-size: 13px;
+      font-family: var(--font);
+      outline: none;
+    }
+    .control-group textarea { resize: vertical; min-height: 56px; }
+    .control-group select option { background: #1a1a2e; }
+
+    .btn-update {
+      grid-column: 1 / -1;
+      padding: 10px;
+      background: var(--blue);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .btn-update:hover { background: #0050cc; }
+
+    /* ── 미리보기 그리드 ── */
+    .preview-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .preview-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .preview-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #9ca3af;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── 광고 소재 공통 ── */
+    .ad-wrap {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    /* 피드: 1:1 */
+    .ad-feed {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+    }
+
+    /* 스토리: 9:16 */
+    .ad-story {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+    }
+
+    .ad-inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8% 7%;
+      background: white;
+      position: relative;
+    }
+
+    /* ── 헤드라인 영역 (상단) ── */
+    .ad-headline-area {
+      width: 100%;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .ad-headline {
+      font-family: var(--font);
+      font-weight: 900;
+      color: var(--dark);
+      line-height: 1.25;
+      word-break: keep-all;
+      white-space: pre-wrap;
+    }
+
+    /* ── 메인 비주얼 (중앙) ── */
+    .ad-visual {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .ad-number {
+      font-family: var(--font);
+      font-weight: 900;
+      color: var(--blue);
+      line-height: 1;
+      text-align: center;
+    }
+
+    /* ── 하단 영역 ── */
+    .ad-bottom {
+      width: 100%;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .ad-subtext {
+      font-family: var(--font);
+      font-weight: 400;
+      color: var(--gray);
+      line-height: 1.5;
+      margin-bottom: 8%;
+      white-space: pre-wrap;
+    }
+
+    .ad-cta {
+      display: inline-block;
+      background: var(--blue);
+      color: white;
+      font-family: var(--font);
+      font-weight: 700;
+      border-radius: 100px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .ad-brand {
+      font-family: var(--font);
+      font-weight: 700;
+      color: var(--blue);
+      text-align: center;
+      margin-top: 4%;
+    }
+
+    /* ── 스토리보드 선택 드롭다운 ── */
+    #c-board-id { background: white !important; color: #111827 !important; }
+    #c-board-id option { background: white; color: #111827; }
+
+    /* ── 배경 이미지 레이어 ── */
+    .ad-inner.has-bg { background-size: cover !important; background-position: center !important; }
+    .ad-inner.has-bg > * { position: relative; z-index: 1; }
+    .ad-inner.has-bg::before {
+      content: ''; position: absolute; inset: 0; z-index: 0;
+    }
+    .ad-inner.overlay-dark::before {
+      background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.1) 45%, rgba(0,0,0,0.55) 100%);
+    }
+    .ad-inner.overlay-light::before {
+      background: linear-gradient(to bottom, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0.45) 100%);
+    }
+
+    /* ── 인스타 UI 오버레이 ── */
+    .insta-ui-top, .insta-ui-bottom {
+      position: absolute;
+      left: 0; right: 0;
+      background: rgba(0,0,0,0.03);
+      display: flex;
+      align-items: center;
+      padding: 0 6%;
+    }
+    .insta-ui-top { top: 0; }
+    .insta-ui-bottom { bottom: 0; }
+
+    .insta-avatar {
+      border-radius: 50%;
+      background: var(--blue);
+      flex-shrink: 0;
+    }
+
+    .insta-name {
+      font-weight: 700;
+      color: var(--dark);
+      margin-left: 4%;
+      flex: 1;
+    }
+
+    .insta-follow {
+      font-weight: 700;
+      color: var(--blue);
+    }
+
+    .insta-action {
+      color: var(--gray);
+      text-align: center;
+      flex: 1;
+    }
+
+    /* ── 다운로드 안내 ── */
+    .download-hint {
+      max-width: 1100px;
+      margin: 24px auto 0;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 13px;
+      color: #9ca3af;
+      line-height: 1.6;
+    }
+    .download-hint strong { color: white; }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>광고 소재 미리보기</h1>
+  <p>스토리보드 설정값을 입력하면 피드/스토리 광고 시안을 실시간으로 확인할 수 있어요.</p>
+
+  <div class="controls">
+
+    <div class="control-group" style="grid-column:1/-1">
+      <label>스토리보드 불러오기</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="c-board-id" style="flex:1;background:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;color:#111827;padding:8px 10px;font-size:13px;font-family:var(--font);outline:none;" onchange="loadFromStoryboard(this.value)">
+          <option value="">— 선택하세요 —</option>
+        </select>
+        <button onclick="pushToNotion()" id="btn-notion"
+          style="padding:8px 14px;background:#5b21b6;color:white;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">
+          Notion 업데이트
+        </button>
+      </div>
+      <div id="notion-status" style="font-size:11px;margin-top:5px;color:#9ca3af"></div>
+    </div>
+
+    <div class="control-group">
+      <label>헤드라인 (엔터로 줄 바꿈)</label>
+      <textarea id="c-headline" rows="2">두 번째 이직은, 94%가 맞아떨어진다</textarea>
+    </div>
+    <div class="control-group">
+      <label>강조 숫자 / 키워드</label>
+      <input type="text" id="c-number" value="94%">
+    </div>
+    <div class="control-group">
+      <label>서브카피</label>
+      <textarea id="c-subtext">커리어벗은 이력서가 아닌 성향으로 회사를 찾아줍니다. 컬처핏 매칭률 94%.</textarea>
+    </div>
+    <div class="control-group">
+      <label>CTA 버튼</label>
+      <input type="text" id="c-cta" value="1분 만에 시작하기">
+    </div>
+    <div class="control-group">
+      <label>브랜드명</label>
+      <input type="text" id="c-brand" value="CareerBut">
+    </div>
+    <div class="control-group">
+      <label>강조 컬러</label>
+      <input type="color" id="c-color" value="#0064FF">
+    </div>
+    <div class="control-group">
+      <label>배경 (프리셋 또는 직접 선택)</label>
+      <select id="c-bg-preset" onchange="syncBgColor(this.value)">
+        <option value="#FFFFFF">순백 (미니멀 클린)</option>
+        <option value="#F8F9FA">오프화이트</option>
+        <option value="#F5F0EB">따뜻한 오피스</option>
+        <option value="#111827">다크 네이비</option>
+        <option value="#0A0A0A">블랙 (대비 강조)</option>
+        <option value="#FFF9F0">크림</option>
+        <option value="#F0F4FF">라이트 블루</option>
+        <option value="custom">직접 선택 →</option>
+      </select>
+      <input type="color" id="c-bg" value="#FFFFFF" style="margin-top:6px;width:100%;height:36px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);cursor:pointer;background:none;" oninput="document.getElementById('c-bg-preset').value='custom'">
+    </div>
+    <div class="control-group">
+      <label>배경 스타일</label>
+      <select id="c-bg-mode" onchange="onBgModeChange()">
+        <option value="color">단색</option>
+        <option value="css">CSS 비주얼</option>
+        <option value="photo">Unsplash 사진</option>
+      </select>
+    </div>
+    <div class="control-group" id="group-visual-key" style="display:none">
+      <label>비주얼 키</label>
+      <select id="c-visual-key" onchange="updateAds()">
+        <option value="미니멀 클린">미니멀 클린</option>
+        <option value="따뜻한 일상">따뜻한 일상</option>
+        <option value="대비 강조">대비 강조</option>
+        <option value="패스트 부드럼">패스트 부드럼</option>
+        <option value="에너지 힙">에너지 힙</option>
+      </select>
+    </div>
+    <div class="control-group" id="group-photo" style="display:none">
+      <label>사진 키워드 (영어)</label>
+      <input type="text" id="c-photo-keyword" placeholder="예: office career burnout" value="office career">
+    </div>
+
+    <button class="btn-update" onclick="updateAds()">미리보기 업데이트</button>
+  </div>
+</div>
+
+<!-- 미리보기 -->
+<div class="preview-grid" id="preview-grid">
+
+  <!-- 피드 A (텍스트 분리) -->
+  <div class="preview-card">
+    <div class="preview-label">피드 — 텍스트 분리</div>
+    <div class="ad-wrap ad-feed" id="feed-a">
+      <div class="ad-inner" id="feed-a-inner">
+        <div class="ad-headline-area">
+          <div class="ad-headline" id="feed-a-headline"></div>
+        </div>
+        <div class="ad-visual">
+          <div class="ad-number" id="feed-a-number"></div>
+        </div>
+        <div class="ad-bottom">
+          <div class="ad-brand" id="feed-a-brand"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 피드 B (카피 포함) -->
+  <div class="preview-card">
+    <div class="preview-label">피드 — 카피 포함</div>
+    <div class="ad-wrap ad-feed" id="feed-b">
+      <div class="ad-inner" id="feed-b-inner">
+        <div class="ad-headline-area">
+          <div class="ad-headline" id="feed-b-headline"></div>
+        </div>
+        <div class="ad-visual">
+          <div class="ad-number" id="feed-b-number"></div>
+        </div>
+        <div class="ad-bottom">
+          <div class="ad-subtext" id="feed-b-subtext"></div>
+          <div class="ad-cta" id="feed-b-cta"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스토리 A (텍스트 분리) -->
+  <div class="preview-card">
+    <div class="preview-label">스토리 — 텍스트 분리</div>
+    <div class="ad-wrap ad-story" id="story-a">
+      <div class="ad-inner" id="story-a-inner">
+        <!-- 인스타 상단 UI -->
+        <div class="insta-ui-top" id="story-a-top">
+          <div class="insta-avatar" id="story-a-avatar"></div>
+          <div class="insta-name" id="story-a-name"></div>
+          <div class="insta-follow">팔로우</div>
+        </div>
+        <div class="ad-headline-area" style="margin-top:15%">
+          <div class="ad-headline" id="story-a-headline"></div>
+        </div>
+        <div class="ad-visual">
+          <div class="ad-number" id="story-a-number"></div>
+        </div>
+        <div class="ad-bottom" style="margin-bottom:15%">
+          <div class="ad-brand" id="story-a-brand"></div>
+        </div>
+        <!-- 인스타 하단 UI -->
+        <div class="insta-ui-bottom" id="story-a-bottom">
+          <div class="insta-action" id="story-a-action"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스토리 B (카피 포함) -->
+  <div class="preview-card">
+    <div class="preview-label">스토리 — 카피 포함</div>
+    <div class="ad-wrap ad-story" id="story-b">
+      <div class="ad-inner" id="story-b-inner">
+        <!-- 인스타 상단 UI -->
+        <div class="insta-ui-top" id="story-b-top">
+          <div class="insta-avatar" id="story-b-avatar"></div>
+          <div class="insta-name" id="story-b-name"></div>
+          <div class="insta-follow">팔로우</div>
+        </div>
+        <div class="ad-headline-area" style="margin-top:15%">
+          <div class="ad-headline" id="story-b-headline"></div>
+        </div>
+        <div class="ad-visual">
+          <div class="ad-number" id="story-b-number"></div>
+        </div>
+        <div class="ad-bottom" style="margin-bottom:15%">
+          <div class="ad-subtext" id="story-b-subtext"></div>
+          <div class="ad-cta" id="story-b-cta"></div>
+        </div>
+        <!-- 인스타 하단 UI -->
+        <div class="insta-ui-bottom" id="story-b-bottom">
+          <div class="insta-action" id="story-b-action"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="download-hint">
+  <strong>이미지로 저장하는 방법:</strong>
+  원하는 광고 시안 위에서 <strong>우클릭 → 다른 이름으로 이미지 저장</strong> 또는
+  브라우저 개발자 도구(F12) → 해당 요소 선택 → 스크린샷으로 저장하세요.<br>
+  실제 AI 이미지 생성은 스토리보드 <strong>섹션 7의 프롬프트</strong>를 ChatGPT(DALL-E 3) 또는 Midjourney에 붙여넣어 사용하세요.
+</div>
+
+<script>
+  // ─── 비주얼 키별 CSS 스타일 ───────────────────────────────────────────────────
+  const VISUAL_STYLES = {
+    '미니멀 클린': {
+      bg: 'linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%)',
+      overlay: 'light', textColor: '#111827', subColor: '#6B7280',
+    },
+    '따뜻한 일상': {
+      bg: 'radial-gradient(ellipse at 25% 35%, #fffbf0 0%, #fde8c8 55%, #f0c080 100%)',
+      overlay: 'light', textColor: '#2d1a00', subColor: '#78451a',
+    },
+    '대비 강조': {
+      bg: 'linear-gradient(160deg, #0a0a0a 0%, #1c1c2e 60%, #16213e 100%)',
+      overlay: 'dark', textColor: '#ffffff', subColor: '#9ca3af',
+    },
+    '패스트 부드럼': {
+      bg: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 35%, #0f3460 70%, #533483 100%)',
+      overlay: 'dark', textColor: '#ffffff', subColor: '#c4b5fd',
+    },
+    '에너지 힙': {
+      bg: 'linear-gradient(135deg, #f72585 0%, #7209b7 40%, #3a0ca3 75%, #4361ee 100%)',
+      overlay: 'dark', textColor: '#ffffff', subColor: '#fde68a',
+    },
+  };
+
+  function isDarkHex(hex) {
+    if (!hex || !hex.startsWith('#')) return false;
+    const r = parseInt(hex.slice(1,3), 16);
+    const g = parseInt(hex.slice(3,5), 16);
+    const b = parseInt(hex.slice(5,7), 16);
+    return (r * 299 + g * 587 + b * 114) / 1000 < 128;
+  }
+
+  function getTextColors(mode, visualKey, bg) {
+    if (mode === 'photo') return { text: '#ffffff', sub: '#e5e7eb' };
+    if (mode === 'css') {
+      const s = VISUAL_STYLES[visualKey] || VISUAL_STYLES['미니멀 클린'];
+      return { text: s.textColor, sub: s.subColor };
+    }
+    const dark = isDarkHex(bg);
+    return { text: dark ? '#ffffff' : '#111827', sub: dark ? '#9ca3af' : '#6B7280' };
+  }
+
+  function applyBackground(prefix, mode, visualKey, keyword, color) {
+    const inner = document.getElementById(`${prefix}-inner`);
+    if (!inner) return;
+    inner.classList.remove('has-bg', 'overlay-dark', 'overlay-light');
+
+    if (mode === 'color') {
+      inner.style.background = color;
+      inner.style.backgroundImage = 'none';
+    } else if (mode === 'css') {
+      const s = VISUAL_STYLES[visualKey] || VISUAL_STYLES['미니멀 클린'];
+      inner.style.background = s.bg;
+      inner.style.backgroundImage = 'none';
+      inner.classList.add('has-bg', s.overlay === 'dark' ? 'overlay-dark' : 'overlay-light');
+    } else if (mode === 'photo') {
+      const url = `https://source.unsplash.com/featured/1080x1080/?${encodeURIComponent(keyword || 'office career')}`;
+      inner.style.backgroundImage = `url(${url})`;
+      inner.style.backgroundSize = 'cover';
+      inner.style.backgroundPosition = 'center';
+      inner.classList.add('has-bg', 'overlay-dark');
+    }
+  }
+
+  function onBgModeChange() {
+    const mode = document.getElementById('c-bg-mode').value;
+    document.getElementById('group-visual-key').style.display = mode === 'css'   ? '' : 'none';
+    document.getElementById('group-photo').style.display      = mode === 'photo' ? '' : 'none';
+    updateAds();
+  }
+
+  function syncBgColor(val) {
+    if (val !== 'custom') {
+      document.getElementById('c-bg').value = val;
+    }
+  }
+
+  function updateAds() {
+    const headline   = document.getElementById('c-headline').value;
+    const number     = document.getElementById('c-number').value;
+    const subtext    = document.getElementById('c-subtext').value;
+    const cta        = document.getElementById('c-cta').value;
+    const brand      = document.getElementById('c-brand').value;
+    const color      = document.getElementById('c-color').value;
+    const bg         = document.getElementById('c-bg').value;
+    const bgMode     = document.getElementById('c-bg-mode').value;
+    const visualKey  = document.getElementById('c-visual-key').value;
+    const photoKw    = document.getElementById('c-photo-keyword').value;
+
+    const { text: textColor, sub: subColor } = getTextColors(bgMode, visualKey, bg);
+
+    // 피드 크기 기준으로 폰트 계산 (피드 너비 ≈ 컨테이너 1/4)
+    const feedSizes  = { headline: 'clamp(12px, 2vw, 18px)', number: 'clamp(40px, 8vw, 72px)', sub: 'clamp(9px, 1.4vw, 13px)', cta: 'clamp(10px, 1.5vw, 14px)', brand: 'clamp(9px, 1.2vw, 12px)', avatar: 'clamp(14px,2vw,20px)', ui: 'clamp(8px,1.2vw,11px)' };
+    const storySizes = { headline: 'clamp(10px, 1.6vw, 15px)', number: 'clamp(32px, 6vw, 56px)', sub: 'clamp(8px, 1.1vw, 11px)', cta: 'clamp(9px, 1.2vw, 12px)', brand: 'clamp(8px, 1vw, 10px)', avatar: 'clamp(12px,1.6vw,16px)', ui: 'clamp(7px,1vw,10px)' };
+
+    const ads = [
+      { prefix: 'feed-a',  sizes: feedSizes,  showSub: false, showCta: false },
+      { prefix: 'feed-b',  sizes: feedSizes,  showSub: true,  showCta: true  },
+      { prefix: 'story-a', sizes: storySizes, showSub: false, showCta: false, story: true },
+      { prefix: 'story-b', sizes: storySizes, showSub: true,  showCta: true,  story: true },
+    ];
+
+    ads.forEach(({ prefix, sizes, showSub, showCta, story }) => {
+      applyBackground(prefix, bgMode, visualKey, photoKw, bg);
+
+      const hl = document.getElementById(`${prefix}-headline`);
+      if (hl) {
+        hl.textContent = headline;
+        hl.style.fontSize = sizes.headline;
+        hl.style.color = textColor;
+      }
+
+      const num = document.getElementById(`${prefix}-number`);
+      if (num) {
+        num.textContent = number;
+        num.style.fontSize = sizes.number;
+        num.style.color = color;
+      }
+
+      const sub = document.getElementById(`${prefix}-subtext`);
+      if (sub) {
+        sub.textContent = subtext;
+        sub.style.fontSize = sizes.sub;
+        sub.style.color = subColor;
+        sub.style.display = showSub ? '' : 'none';
+      }
+
+      const ctaEl = document.getElementById(`${prefix}-cta`);
+      if (ctaEl) {
+        ctaEl.textContent = cta;
+        ctaEl.style.fontSize = sizes.cta;
+        ctaEl.style.background = color;
+        ctaEl.style.padding = `${parseFloat(sizes.cta) * 0.7}px ${parseFloat(sizes.cta) * 1.2}px`;
+        ctaEl.style.display = showCta ? '' : 'none';
+      }
+
+      const brandEl = document.getElementById(`${prefix}-brand`);
+      if (brandEl) {
+        brandEl.textContent = brand;
+        brandEl.style.fontSize = sizes.brand;
+        brandEl.style.color = color;
+        brandEl.style.display = showCta ? 'none' : '';
+      }
+
+      if (story) {
+        const topEl = document.getElementById(`${prefix}-top`);
+        const botEl = document.getElementById(`${prefix}-bottom`);
+        const avatarEl = document.getElementById(`${prefix}-avatar`);
+        const nameEl = document.getElementById(`${prefix}-name`);
+        const actionEl = document.getElementById(`${prefix}-action`);
+        const sz = parseFloat(sizes.avatar);
+
+        if (topEl) {
+          topEl.style.height = `${sz * 2.2}px`;
+          topEl.style.gap = `${sz * 0.4}px`;
+        }
+        if (botEl) {
+          botEl.style.height = `${sz * 2.2}px`;
+        }
+        if (avatarEl) {
+          avatarEl.style.width = `${sz}px`;
+          avatarEl.style.height = `${sz}px`;
+          avatarEl.style.background = color;
+        }
+        if (nameEl) {
+          nameEl.textContent = brand;
+          nameEl.style.fontSize = sizes.ui;
+          nameEl.style.color = textColor;
+        }
+        if (actionEl) {
+          actionEl.textContent = '더 알아보기 ↑';
+          actionEl.style.fontSize = sizes.ui;
+          actionEl.style.color = textColor;
+        }
+      }
+    });
+  }
+
+  // ─── 스토리보드 목록 로드 ───────────────────────────────────────────────────
+  async function loadBoardList() {
+    const sel = document.getElementById('c-board-id');
+    if (!sel) { console.error('c-board-id 요소 없음'); return; }
+    try {
+      const res = await fetch('/api/storyboards');
+      if (!res.ok) throw new Error('API 오류: ' + res.status);
+      const boards = await res.json();
+      console.log('스토리보드 목록:', boards);
+      if (!boards.length) {
+        sel.innerHTML = '<option value="">저장된 스토리보드 없음</option>';
+        return;
+      }
+      sel.innerHTML = '<option value="">— 선택하세요 —</option>' +
+        boards.map(b => `<option value="${b.id}">${b.id}</option>`).join('');
+    } catch(e) {
+      console.error('loadBoardList 오류:', e);
+      sel.innerHTML = '<option value="">서버 연결 실패 (npm start 확인)</option>';
+    }
+  }
+
+  // ─── Notion 반영 ────────────────────────────────────────────────────────────
+  async function pushToNotion() {
+    const boardId = document.getElementById('c-board-id').value;
+    const status  = document.getElementById('notion-status');
+    const btn     = document.getElementById('btn-notion');
+
+    if (!boardId) {
+      status.textContent = '⚠️ 스토리보드를 선택해주세요';
+      status.style.color = '#f59e0b';
+      return;
+    }
+
+    btn.textContent = '전송 중...';
+    btn.disabled = true;
+    status.textContent = '';
+
+    try {
+      const res = await fetch('/api/update-storyboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          boardId,
+          headline: document.getElementById('c-headline').value,
+          subtext:  document.getElementById('c-subtext').value,
+          cta:      document.getElementById('c-cta').value,
+          color:    document.getElementById('c-color').value,
+          bg:       document.getElementById('c-bg').value,
+        }),
+      });
+      const result = await res.json();
+      if (result.success && !result.warning) {
+        status.textContent = '✅ 로컬 파일 + Notion 스토리보드 업데이트 완료!';
+        status.style.color = '#34d399';
+      } else if (result.success && result.warning) {
+        status.textContent = `⚠️ ${result.warning}`;
+        status.style.color = '#f59e0b';
+      } else {
+        status.textContent = `❌ ${result.error}`;
+        status.style.color = '#f87171';
+      }
+    } catch (err) {
+      status.textContent = '❌ 서버에 연결할 수 없어요. npm start를 실행해주세요.';
+      status.style.color = '#f87171';
+    } finally {
+      btn.textContent = 'Notion에 반영';
+      btn.disabled = false;
+    }
+  }
+
+  // ─── 스토리보드 불러오기 ──────────────────────────────────────────────────────
+  async function loadFromStoryboard(boardId) {
+    if (!boardId) return;
+
+    const status = document.getElementById('notion-status');
+    status.textContent = '불러오는 중...';
+    status.style.color = '#9ca3af';
+
+    try {
+      const res = await fetch(`/api/storyboard-preview/${boardId}`);
+      if (!res.ok) throw new Error('불러오기 실패');
+      const data = await res.json();
+
+      if (data.headline) document.getElementById('c-headline').value = data.headline;
+      if (data.subtext)  document.getElementById('c-subtext').value  = data.subtext;
+      if (data.cta)      document.getElementById('c-cta').value      = data.cta;
+      if (data.color)    document.getElementById('c-color').value    = data.color;
+      if (data.bg) {
+        document.getElementById('c-bg').value = data.bg;
+        document.getElementById('c-bg-preset').value = 'custom';
+      }
+
+      updateAds();
+      status.textContent = `✅ ${boardId} 불러오기 완료`;
+      status.style.color = '#34d399';
+    } catch (err) {
+      status.textContent = '❌ ' + err.message;
+      status.style.color = '#f87171';
+    }
+  }
+
+  // 초기 렌더
+  try { updateAds(); } catch(e) { console.error('updateAds 오류:', e); }
+  loadBoardList();
+</script>
+</body>
+</html>
