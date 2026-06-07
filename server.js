@@ -29,7 +29,7 @@ const PERSONA_MAP = {
 
 const SIZE_LABEL = {
   '둘 다': '1080×1080 (피드) + 1080×1920 (스토리)',
-  '피드': '1080×1080 (피드)',
+  '피드': '1080×1440 (피드)',
   '스토리': '1080×1920 (스토리)',
 };
 
@@ -501,21 +501,23 @@ app.get('/api/request-settings', (_req, res) => {
   };
 
   res.json({
-    campaign: get('캠페인 목적'),
-    emphasis: get('강조점').replace('(없음)', ''),
-    persona:  get('페르소나').charAt(0),
-    concept:  get('광고 개념'),
-    layout:   get('이미지 구성'),
-    visual:   get('비주얼 키'),
-    color:    get('메인 컬러').replace('(비주얼 키 기본값)', ''),
-    size:     get('사이즈').replace(' (피드 + 스토리)', '').replace(' (피드+스토리)', ''),
-    memo:     get('강조 메모').replace('(없음)', ''),
+    campaign:    get('캠페인 목적'),
+    emphasis:    get('강조점').replace('(없음)', ''),
+    persona:     get('페르소나').charAt(0),
+    concept:     get('광고 개념'),
+    layout:      get('이미지 구성'),
+    visual:      get('비주얼 키'),
+    color:       get('메인 컬러').replace('(비주얼 키 기본값)', ''),
+    accentColor: get('보조 컬러').replace('(없음)', ''),
+    size:        get('사이즈').replace(' (피드 + 스토리)', '').replace(' (피드+스토리)', ''),
+    visualMemo:  get('비주얼 방향').replace('(없음)', ''),
+    copyMemo:    get('카피 방향').replace('(없음)', ''),
   });
 });
 
 // POST /api/request-settings — 생성요청.md 업데이트
 app.post('/api/request-settings', (req, res) => {
-  const { campaign, emphasis, persona, concept, layout, visual, color, size, memo } = req.body;
+  const { campaign, emphasis, persona, concept, layout, visual, color, accentColor, size, visualMemo, copyMemo } = req.body;
   const file = join(__dirname, '생성요청.md');
 
   const personaMap = {
@@ -540,11 +542,13 @@ app.post('/api/request-settings', (req, res) => {
 | 강조점 | ${emphasis || '(없음)'} |
 | 페르소나 | ${personaMap[persona] || personaMap['1']} |
 | 광고 개념 | ${concept || '팩트자극'} |
-| 이미지 구성 | ${layout || '텍스트70+이미지30'} |
+| 이미지 구성 | ${layout || '텍스트 중앙 수직'} |
 | 비주얼 키 | ${visual || '미니멀 클린'} |
 | 메인 컬러 | ${color || '(비주얼 키 기본값)'} |
+| 보조 컬러 | ${accentColor || '(없음)'} |
 | 사이즈 | ${sizeLabel || '둘 다 (피드 + 스토리)'} |
-| 강조 메모 | ${memo || '(없음)'} |
+| 비주얼 방향 | ${visualMemo || '(없음)'} |
+| 카피 방향 | ${copyMemo || '(없음)'} |
 
 ---
 
@@ -554,14 +558,11 @@ app.post('/api/request-settings', (req, res) => {
 - **2** — 27세 기획 2년차, 이 직무가 맞는지 모르겠고 방향 자체가 없음
 - **3** — 35세 영업 7년차, 번아웃, 이직 의지 있으나 에너지 없어 탐색 미룸
 
-## 광고 개념 선택지
-팩트자극 / 해결사 / 공감 / 호기심 / 데이터 / 직접 입력
-
 ## 이미지 구성 선택지
-텍스트70+이미지30 / 텍스트100 / 이미지100 / 직접 입력
+텍스트 중앙 수직 / 숫자·키워드 강조 / 비주얼 우선 / 카드형 / 분할형 / 직접 입력
 
 ## 비주얼 키 선택지
-미니멀 클린 / 따뜻한 일상 / 대비 강조 / 패스트 부드럼 / 에너지 힙 / 직접 입력
+미니멀 클린 / 따뜻한 일상 / 대비 강조 / 블루 그라데이션 / 에너지 힙 / 프로페셔널 클린 / 다크 프리미엄 / 네온 팝 / 직접 입력
 `;
 
   writeFileSync(file, content, 'utf-8');

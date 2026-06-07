@@ -163,44 +163,121 @@
 
     <div class="field">
       <label>이미지 구성</label>
-      <div class="radio-group">
-        <input type="radio" name="layout" id="l1" value="텍스트70+이미지30"><label for="l1">텍스트70+이미지30</label>
-        <input type="radio" name="layout" id="l2" value="텍스트100"><label for="l2">텍스트100</label>
-        <input type="radio" name="layout" id="l3" value="이미지100"><label for="l3">이미지100</label>
-      </div>
-      <div class="desc" style="margin-top:6px">
-        텍스트70+이미지30=카피가 주인공, 숫자/아이콘 보조 &nbsp;|&nbsp; 텍스트100=문장만으로 승부 &nbsp;|&nbsp; 이미지100=숫자/비주얼만으로 전달
+      <div class="radio-group" style="flex-direction:column;gap:8px">
+        <span>
+          <input type="radio" name="layout" id="l1" value="텍스트 중앙 수직">
+          <label for="l1" style="display:inline-block">텍스트 중앙 수직</label>
+          <span style="font-size:11px;color:var(--gray-400);margin-left:8px">헤드라인 + 숫자/키워드 + CTA 세로 배열. 메시지가 명확할 때</span>
+        </span>
+        <span>
+          <input type="radio" name="layout" id="l2" value="숫자/키워드 강조">
+          <label for="l2" style="display:inline-block">숫자/키워드 강조</label>
+          <span style="font-size:11px;color:var(--gray-400);margin-left:8px">대형 숫자나 한 단어가 화면을 지배. "94%", "지금이야" 같은 임팩트</span>
+        </span>
+        <span>
+          <input type="radio" name="layout" id="l3" value="비주얼 우선">
+          <label for="l3" style="display:inline-block">비주얼 우선</label>
+          <span style="font-size:11px;color:var(--gray-400);margin-left:8px">이미지/그래픽 중심, 텍스트 최소화. 감정 자극형</span>
+        </span>
+        <span>
+          <input type="radio" name="layout" id="l4" value="카드형">
+          <label for="l4" style="display:inline-block">카드형</label>
+          <span style="font-size:11px;color:var(--gray-400);margin-left:8px">배경 위에 흰 카드 박스로 카피 정리. 정보 전달에 유리</span>
+        </span>
+        <span>
+          <input type="radio" name="layout" id="l5" value="분할형">
+          <label for="l5" style="display:inline-block">분할형</label>
+          <span style="font-size:11px;color:var(--gray-400);margin-left:8px">상하 또는 좌우로 영역 분리. 헤드라인 / 비주얼 구분</span>
+        </span>
       </div>
     </div>
 
     <div class="field">
       <label>비주얼 키</label>
-      <div class="radio-group">
-        <input type="radio" name="visual" id="v1" value="미니멀 클린"><label for="v1">미니멀 클린</label>
-        <input type="radio" name="visual" id="v2" value="따뜻한 일상"><label for="v2">따뜻한 일상</label>
-        <input type="radio" name="visual" id="v3" value="대비 강조"><label for="v3">대비 강조</label>
-        <input type="radio" name="visual" id="v4" value="패스트 부드럼"><label for="v4">패스트 부드럼</label>
-        <input type="radio" name="visual" id="v5" value="에너지 힙"><label for="v5">에너지 힙</label>
+      <div class="radio-group" style="flex-direction:column;gap:8px">
+        <span>
+          <input type="radio" name="visual" id="v1" value="미니멀 클린">
+          <label for="v1" style="display:inline-block">미니멀 클린</label>
+          <span style="font-size:11px;color:var(--gray-400);margin-left:8px">흰 배경 + 산세리프 폰트. 신뢰감, 데이터 중심 광고에 적합</span>
+        </span>
+        <span>
+          <input type="radio" name="visual" id="v2" value="따뜻한 일상">
+          <label for="v2" style="display:inline-block">따뜻한 일상</label>
+          <span style="font-size:11px;color:var(--gray-400);margin-left:8px">베이지·크림 톤 + 부드러운 질감. 공감·위로 광고에 적합</span>
+        </span>
+        <span>
+          <input type="radio" name="visual" id="v3" value="대비 강조">
+          <label for="v3" style="display:inline-block">대비 강조</label>
+          <span style="font-size:11px;color:var(--gray-400);margin-left:8px">다크 배경 + 밝은 텍스트. 강렬한 메시지, 재방문 유도</span>
+        </span>
+        <span>
+          <input type="radio" name="visual" id="v4" value="블루 그라데이션">
+          <label for="v4" style="display:inline-block">블루 그라데이션</label>
+          <span style="font-size:11px;color:var(--gray-400);margin-left:8px">파란 계열 부드러운 그라데이션. 전문성·안정감</span>
+        </span>
+        <span>
+          <input type="radio" name="visual" id="v5" value="에너지 힙">
+          <label for="v5" style="display:inline-block">에너지 힙</label>
+          <span style="font-size:11px;color:var(--gray-400);margin-left:8px">핑크·퍼플 그라데이션. 2030 타겟, 강렬한 감정 자극</span>
+        </span>
+        <span>
+          <input type="radio" name="visual" id="v6" value="프로페셔널 클린">
+          <label for="v6" style="display:inline-block">프로페셔널 클린</label>
+          <span style="font-size:11px;color:var(--gray-400);margin-left:8px">흰 배경 + 네이비·그레이. 비즈니스·경력 관련 신뢰감</span>
+        </span>
+        <span>
+          <input type="radio" name="visual" id="v7" value="다크 프리미엄">
+          <label for="v7" style="display:inline-block">다크 프리미엄</label>
+          <span style="font-size:11px;color:var(--gray-400);margin-left:8px">블랙·차콜 배경 + 골드/화이트. 고급스럽고 진지한 톤</span>
+        </span>
+        <span>
+          <input type="radio" name="visual" id="v8" value="네온 팝">
+          <label for="v8" style="display:inline-block">네온 팝</label>
+          <span style="font-size:11px;color:var(--gray-400);margin-left:8px">형광색 포인트 + 다크 배경. 눈에 띄는 즉각적 임팩트</span>
+        </span>
       </div>
     </div>
 
     <div class="field">
-      <label>메인 컬러 <span style="font-weight:400;color:var(--gray-400);font-size:12px">(선택)</span></label>
-      <input type="text" id="color" placeholder='예: "#0064FF" 또는 "딥 그린" — 비워두면 비주얼 키 기본값 사용'>
+      <label>컬러 설정 <span style="font-weight:400;color:var(--gray-400);font-size:12px">(선택)</span></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray-700);margin-bottom:4px">메인 컬러</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="color" id="color-picker" value="#0064FF" style="width:36px;height:36px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;padding:2px">
+            <input type="text" id="color" placeholder="#0064FF" style="flex:1">
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray-700);margin-bottom:4px">보조 컬러 (Accent)</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="color" id="accent-color-picker" value="#111827" style="width:36px;height:36px;border:1px solid var(--gray-200);border-radius:6px;cursor:pointer;padding:2px">
+            <input type="text" id="accent-color" placeholder="#111827" style="flex:1">
+          </div>
+        </div>
+      </div>
+      <div class="field-hint">비워두면 비주얼 키 기본값 사용. 피커 클릭 → 색상 선택 → 텍스트창에 자동 입력</div>
     </div>
 
     <div class="field">
       <label>사이즈</label>
       <div class="radio-group">
         <input type="radio" name="size" id="s1" value="둘 다"><label for="s1">둘 다 (피드+스토리)</label>
-        <input type="radio" name="size" id="s2" value="피드"><label for="s2">피드만 (1080×1080)</label>
+        <input type="radio" name="size" id="s2" value="피드"><label for="s2">피드만 (1080×1440)</label>
         <input type="radio" name="size" id="s3" value="스토리"><label for="s3">스토리만 (1080×1920)</label>
       </div>
     </div>
 
     <div class="field">
-      <label>강조 메모 <span style="font-weight:400;color:var(--gray-400);font-size:12px">(선택)</span></label>
-      <textarea id="memo" placeholder="추가 요청사항을 자유롭게 입력하세요&#10;예: 번아웃 직장인의 지친 느낌을 이미지에 담아줘"></textarea>
+      <label>비주얼 방향 메모 <span style="font-weight:400;color:var(--gray-400);font-size:12px">(선택)</span></label>
+      <textarea id="visual-memo" placeholder="이미지/배경/분위기에 대한 구체적 요청&#10;예: 번아웃한 직장인이 핸드폰을 보는 손 클로즈업, 어두운 오피스 배경"></textarea>
+      <div class="field-hint">이미지 생성 프롬프트(섹션 7)의 품질에 직접 영향을 줍니다</div>
+    </div>
+
+    <div class="field">
+      <label>카피 방향 메모 <span style="font-weight:400;color:var(--gray-400);font-size:12px">(선택)</span></label>
+      <textarea id="copy-memo" placeholder="헤드라인/서브카피 톤이나 내용에 대한 구체적 요청&#10;예: 판단 없이 공감하는 톤, '아직'이라는 단어 활용, 행동 유발보다 공감 먼저"></textarea>
+      <div class="field-hint">헤드라인·서브카피·CTA 후보(섹션 5)의 방향에 영향을 줍니다</div>
     </div>
   </div>
 
@@ -246,30 +323,56 @@
       const vBtn = document.querySelector(`input[name="visual"][value="${s.visual}"]`);
       if (vBtn) vBtn.checked = true;
 
-      if (s.color) document.getElementById('color').value = s.color;
+      if (s.color) {
+        document.getElementById('color').value = s.color;
+        if (s.color.startsWith('#')) document.getElementById('color-picker').value = s.color;
+      }
+      if (s.accentColor) {
+        document.getElementById('accent-color').value = s.accentColor;
+        if (s.accentColor.startsWith('#')) document.getElementById('accent-color-picker').value = s.accentColor;
+      }
 
       // 사이즈
       const sBtn = document.querySelector(`input[name="size"][value="${s.size}"]`);
       if (sBtn) sBtn.checked = true;
 
-      if (s.memo) document.getElementById('memo').value = s.memo;
+      if (s.visualMemo) document.getElementById('visual-memo').value = s.visualMemo;
+      if (s.copyMemo)   document.getElementById('copy-memo').value   = s.copyMemo;
     } catch(e) {}
   }
+
+  // 컬러 피커 ↔ 텍스트 동기화
+  document.getElementById('color-picker').addEventListener('input', e => {
+    document.getElementById('color').value = e.target.value;
+  });
+  document.getElementById('color').addEventListener('input', e => {
+    if (/^#[0-9a-fA-F]{6}$/.test(e.target.value))
+      document.getElementById('color-picker').value = e.target.value;
+  });
+  document.getElementById('accent-color-picker').addEventListener('input', e => {
+    document.getElementById('accent-color').value = e.target.value;
+  });
+  document.getElementById('accent-color').addEventListener('input', e => {
+    if (/^#[0-9a-fA-F]{6}$/.test(e.target.value))
+      document.getElementById('accent-color-picker').value = e.target.value;
+  });
 
   async function saveSettings() {
     const customCampaign = document.getElementById('campaign-custom').value.trim();
     const checkedCampaign = document.querySelector('input[name="campaign"]:checked');
 
     const data = {
-      campaign: customCampaign || (checkedCampaign ? checkedCampaign.value : '어시스턴트 첫 사용 유도'),
-      emphasis: document.getElementById('emphasis').value.trim(),
-      persona:  document.querySelector('input[name="persona"]:checked')?.value || '1',
-      concept:  document.querySelector('input[name="concept"]:checked')?.value || '팩트자극',
-      layout:   document.querySelector('input[name="layout"]:checked')?.value || '텍스트70+이미지30',
-      visual:   document.querySelector('input[name="visual"]:checked')?.value || '미니멀 클린',
-      color:    document.getElementById('color').value.trim(),
-      size:     document.querySelector('input[name="size"]:checked')?.value || '둘 다',
-      memo:     document.getElementById('memo').value.trim(),
+      campaign:    customCampaign || (checkedCampaign ? checkedCampaign.value : '어시스턴트 첫 사용 유도'),
+      emphasis:    document.getElementById('emphasis').value.trim(),
+      persona:     document.querySelector('input[name="persona"]:checked')?.value || '1',
+      concept:     document.querySelector('input[name="concept"]:checked')?.value || '팩트자극',
+      layout:      document.querySelector('input[name="layout"]:checked')?.value || '텍스트 중앙 수직',
+      visual:      document.querySelector('input[name="visual"]:checked')?.value || '미니멀 클린',
+      color:       document.getElementById('color').value.trim(),
+      accentColor: document.getElementById('accent-color').value.trim(),
+      size:        document.querySelector('input[name="size"]:checked')?.value || '둘 다',
+      visualMemo:  document.getElementById('visual-memo').value.trim(),
+      copyMemo:    document.getElementById('copy-memo').value.trim(),
     };
 
     try {
